@@ -27,6 +27,6 @@ BCT(SP500, 10)
 }
 \references{
 {Yahoo! finance.}
-(\href{https://finance.yahoo.com/quote/\%5EGSPC/history/}{yahoo_finance})
+(\href{https://finance.yahoo.com/quote/^GSPC}{yahoo_finance})
 }
 \keyword{datasets}

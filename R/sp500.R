@@ -17,7 +17,7 @@
 #' @keywords datasets
 #'
 #' @references {Yahoo! finance.}
-#' (\href{https://finance.yahoo.com/quote/\%5EGSPC/history/}{yahoo_finance})
+#' (\href{https://finance.yahoo.com/quote/^GSPC}{yahoo_finance})
 #' @examples 
 #' BCT(SP500, 10)
 #' 

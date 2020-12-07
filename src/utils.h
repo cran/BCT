@@ -1539,10 +1539,13 @@ Rcpp::List online_predict( int train_size) {
             nodes_ct[d]->lw = log2(beta) + nodes_ct[d]->le + log2(exp(1))*(pow(2.0, -delta) - pow(2.0, -2.0*delta - 1));
           }
         }
-        
-        
-        
       }
+
+      long double prob = pow(2, Temp[0][0]->lw - temp_ctw);
+      probs[encoder[alphabet[t]]] = prob;
+      
+      
+      //END of sequential CTW
       // releases the memory
       for (int d = Temp.size() - 1; d >= 0; d--) {
         for (unsigned int k = 0; k < Temp[d].size(); k++) {
@@ -1552,10 +1555,7 @@ Rcpp::List online_predict( int train_size) {
         }
       }
       
-      //END of sequential CTW
       
-      long double prob = pow(2, Temp[0][0]->lw - temp_ctw);
-      probs[encoder[alphabet[t]]] = prob;
       
       if (prob > max_p) {
         max_i = t; max_p = prob;
