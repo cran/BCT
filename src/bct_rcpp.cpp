@@ -316,6 +316,11 @@ List BCT(CharacterVector input_data, IntegerVector depth, Nullable<NumericVector
   return results;
 } 
 
+
+
+
+
+
 //==================================================================================
 //' @title Calculating the 0-1 loss incurred in prediction
 //' @description Compute the 0-1 loss, i.e., the proportion of incorrectly predicted values,
@@ -507,17 +512,19 @@ List compute_counts(CharacterVector input_data, IntegerVector depth){
   return(out);
 } 
 
-//==================================================================================
+
+// ========================================================================================================
 
 //' @title Context Tree Weighting (CTW) algorithm
-//' @description Computes the prior predictive likelihood of the data.
+//' @description Computes the prior predictive likelihood of the data given a specific alphabet. This function is used in for change-point point/segmentation problems
 //' @param input_data the sequence to be analysed. 
 //' The sequence needs to be a "character" object. See the examples section of the BCT/kBCT functions on how to transform any dataset to a "character" object.
 //' @param depth maximum memory length.
+//' @param desired_alphabet set containing the symbols of the process. If not initialised, the default set contains all the unique symbols which appear in the sequence. 
+//' This parameter is needed for the segmentation problem where short segments might not contain all the symbols in the alphabet.
 //' @param beta hyper-parameter of the model prior. 
 //' Takes values between 0 and 1. If not initialised in the call function, the default value is \ifelse{html}{\out{1-2<sup>-m+1</sup>}}{\eqn{1 - 2^{-m+1}}}, 
 //' where \ifelse{html}{\out{m}}{\eqn{m}} is the size of the alphabet; for more information see \href{https://arxiv.org/pdf/2007.14900.pdf}{Kontoyiannis et al. (2020)}.
-//' 
 //' @return returns the natural logarithm of the prior predictive likelihood of the data. 
 //'
 //' @seealso \code{\link{BCT}}, \code{\link{kBCT}}
@@ -528,29 +535,47 @@ List compute_counts(CharacterVector input_data, IntegerVector depth){
 //' # For the gene_s dataset with a maximum depth of 10 (with dafault value of beta):
 //' CTW(gene_s, 10)
 //' 
+//' # With the ["0", "1", "2", "3"] alphabet
+//' CTW(gene_s, 10, "0123")
+//' 
 //' # For custom beta (e.g. 0.8):
-//' CTW(gene_s, 10, 0.8)
+//' CTW(gene_s, 10, ,0.8)
 // [[Rcpp::export]]
-long double CTW(CharacterVector input_data, IntegerVector depth, Nullable<NumericVector> beta = R_NilValue){
+long double CTW(CharacterVector input_data, IntegerVector depth, Nullable<CharacterVector> desired_alphabet = R_NilValue, Nullable<NumericVector> beta = R_NilValue){
   int D;
- // int k_max;
+  // int k_max;
   double b;
   D = depth[0];
   std::string s = Rcpp::as<std::string>(input_data);
   
-  
-  if(beta.isNotNull()){
-    NumericVector beta_(beta);
-    b = beta_[0];
-    set_global_parameters(s, D, 0, b);
+  if(desired_alphabet.isNotNull()){
+    std::string given_alphabet = Rcpp::as<std::string>(desired_alphabet);
+    if(beta.isNotNull()){
+      NumericVector beta_(beta);
+      b = beta_[0];
+      set_global_parameters_with_alphabet(s, D, 0, given_alphabet, b);
+    }
+    else
+      set_global_parameters_with_alphabet(s, D, 0, given_alphabet);
   }
-  else
-    set_global_parameters(s, D, 0);
   
- long double prob = build_ctw_rcpp();
- Rcout<<"log-Prior predictive likelihood:"<<endl;
- return(prob*log(2)); // in the C files the logarithm is in base 2
+  else{
+    if(beta.isNotNull()){
+      NumericVector beta_(beta);
+      b = beta_[0];
+      set_global_parameters(s, D, 0, b);
+    }
+    else
+      set_global_parameters(s, D, 0);
+  }
+  long double prob = build_ctw_rcpp();
+  //Rcout<<"log-Prior predictive likelihood:"<<endl;
+  return(prob*log(2)); // in the C files the logarithm is in base 2
 }
+
+
+
+
 
 // ========================================================================================================
 

@@ -45,9 +45,11 @@ void init_tree(tree& T);                  // initialises the tree for bct/kbct
 void preproc(vector <node *> init);             // does the preprocessing calculations needed for k-bct
 
 void set_param(string &s, int depth, short kmax);  //initialises the parameters
+void set_param_with_alphabet(string &s, int depth, vector<char> given_alphabet);
 void set_global_parameters(string &s, int depth, short kmax); //used for initialising the global parameters in bct (where kmax is not needed)
 void set_global_parameters(string &s, int depth, short kmax, double b); //used for initialising the global parameters in kbct 
-
+void set_global_parameters_with_alphabet(string &s, int depth, short kmax,  vector<char> given_alphabet);
+void set_global_parameters_with_alphabet(string &s, int depth, short kmax,  vector<char> given_alphabet, double b);
 
 
 //2. Functions used for building Tmax
@@ -422,7 +424,7 @@ long double bct(tree& T) {                   // algorithm takes improper tree fi
       return T[0][0]->lw;              // output value of weighted prob Pw at root
     }
   }
-  delete length;
+  delete [] length;
   return T[0][0]->lw;              // output value of weighted prob Pw at root
   
 }
@@ -1133,6 +1135,41 @@ void set_param(string &s, int depth){ // just as before, but without the kmax pa
   }
   
 }
+
+// =====================================================================================================
+
+
+void set_param_with_alphabet(string &s, int depth, string &given_alphabet){ // just as before, but without the kmax parameter
+  
+  D = depth;
+  
+  xn.clear();
+  zeros.clear();
+  encoder.clear();
+  decoder.clear();
+  
+  
+  for(char c:given_alphabet){
+    if(encoder.find(c) == encoder.end()){
+      encoder.insert({c,encoder.size()});  
+    } 
+  }
+  
+  for (char c : s) {
+    xn.push_back(encoder[c]);
+  }
+  for (map<char, short>::iterator i = encoder.begin(); i != encoder.end(); ++i)
+    decoder[i->second] = i->first;
+  
+  m = encoder.size();
+  for(int i=0;i<m;i++){
+    zeros.push_back(0);
+  }
+  
+}
+
+
+
 // ======================================================================================================
 void set_global_parameters(string &s, int depth, short kmax){ // after reading and encoding the input dataset, the global parameters are fixed 
   set_param(s, depth, kmax);
@@ -1149,6 +1186,30 @@ void set_global_parameters(string &s, int depth, short kmax, double b){
   alpha = pow((1.0 - beta), (1.0 / (m - 1.0)));
 }
 // ======================================================================================================
+
+void set_global_parameters_with_alphabet(string &s, int depth, short kmax, string &given_alphabet){ // after reading and encoding the input dataset, the global parameters are fixed 
+  set_param_with_alphabet(s, depth, given_alphabet);
+  beta = 1 - pow(2, -(m - 1)); // default value for the prior hyper-parameter
+  alpha = pow((1.0 - beta), (1.0 / (m - 1.0)));
+}
+
+
+// ======================================================================================================
+void set_global_parameters_with_alphabet(string &s, int depth, short kmax, string &given_alphabet, double b){
+  set_param_with_alphabet(s, depth, given_alphabet);
+  if(b>0 && b<1)
+    beta = b;   // for a custom beta.
+  else
+    beta = 1 - pow(2, -(m - 1));
+  alpha = pow((1.0 - beta), (1.0 / (m - 1.0)));
+}
+
+
+
+// ======================================================================================================
+
+
+
 vector <Tree_properties> build_kbct() {
   
   

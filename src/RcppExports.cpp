@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // kBCT
 List kBCT(CharacterVector input_data, IntegerVector depth, IntegerVector k, Nullable<NumericVector> beta);
 RcppExport SEXP _BCT_kBCT(SEXP input_dataSEXP, SEXP depthSEXP, SEXP kSEXP, SEXP betaSEXP) {
@@ -99,15 +104,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // CTW
-long double CTW(CharacterVector input_data, IntegerVector depth, Nullable<NumericVector> beta);
-RcppExport SEXP _BCT_CTW(SEXP input_dataSEXP, SEXP depthSEXP, SEXP betaSEXP) {
+long double CTW(CharacterVector input_data, IntegerVector depth, Nullable<CharacterVector> desired_alphabet, Nullable<NumericVector> beta);
+RcppExport SEXP _BCT_CTW(SEXP input_dataSEXP, SEXP depthSEXP, SEXP desired_alphabetSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< CharacterVector >::type input_data(input_dataSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type depth(depthSEXP);
+    Rcpp::traits::input_parameter< Nullable<CharacterVector> >::type desired_alphabet(desired_alphabetSEXP);
     Rcpp::traits::input_parameter< Nullable<NumericVector> >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(CTW(input_data, depth, beta));
+    rcpp_result_gen = Rcpp::wrap(CTW(input_data, depth, desired_alphabet, beta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -133,7 +139,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BCT_prediction", (DL_FUNC) &_BCT_prediction, 4},
     {"_BCT_ML", (DL_FUNC) &_BCT_ML, 2},
     {"_BCT_compute_counts", (DL_FUNC) &_BCT_compute_counts, 2},
-    {"_BCT_CTW", (DL_FUNC) &_BCT_CTW, 3},
+    {"_BCT_CTW", (DL_FUNC) &_BCT_CTW, 4},
     {"_BCT_MAP_parameters", (DL_FUNC) &_BCT_MAP_parameters, 3},
     {NULL, NULL, 0}
 };

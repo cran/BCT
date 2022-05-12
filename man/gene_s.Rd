@@ -24,7 +24,7 @@ BCT(gene_s, 5)
 (\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7094943/}{PMC})
 
 {Yan, R., Y. Zhang, Y. Li, L. Xia, Y. Guo, and Q. Zhou (2020). Structural basis for the recognition of SARS-CoV-2 by full-length human ACE2. Science 367(6485), 1444–1448.}
-(\href{https://science.sciencemag.org/content/367/6485/1444}{aaas})
+(\href{https://www.science.org/doi/10.1126/science.abb2762}{aaas})
 
 {Lan, J., J. Ge, J. Yu, et al. (2020). Structure of the SARS-CoV-2 spike receptor-binding domain bound to the ACE2 receptor. Nature 581, 215–220.}
 (\href{https://www.nature.com/articles/s41586-020-2180-5}{nature})
